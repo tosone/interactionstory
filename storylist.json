@@ -1,0 +1,32 @@
+[
+  {
+    "name": "小红帽",
+    "version": "0.0.1",
+    "type": "basic",
+    "path": "/home/root/userdata/resource/interaction_story/basic/smallredhat"
+  },
+  {
+    "name": "山洞的怪物",
+    "version": "0.0.1",
+    "type": "interaction",
+    "path": "/home/root/userdata/resource/interaction_story/interaction/shandongdeguaiwu"
+  },
+  {
+    "name": "小狗便便",
+    "version": "0.0.1",
+    "type": "interaction",
+    "path": "/home/root/userdata/resource/interaction_story/interaction/xiaogoubianbian"
+  },
+  {
+    "name": "方形的蛋",
+    "version": "0.0.1",
+    "type": "picture",
+    "path": "/home/root/userdata/resource/interaction_story/picture/fangxingdedan"
+  },
+  {
+    "name": "乌鸦面包店",
+    "version": "0.0.1",
+    "type": "picture",
+    "path": "/home/root/userdata/resource/interaction_story/picture/wuyamianbaodian"
+  }
+]
