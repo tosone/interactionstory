@@ -54,7 +54,7 @@ module.exports = (text, storyType, search) => {
             if (onlineStory['priority'] === 1) {
               download(bucket, onlineStory[storyType === 'interaction' ? 'filename' : 'storyAudioFile'], storyType);
             } else {
-              util.exitWithAudio(file.storybuy, false, true)
+              util.exitWithAudio(file.storybuy, false, true);
             }
           }
         } else {

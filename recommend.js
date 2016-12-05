@@ -1,14 +1,17 @@
 'use strict';
 
+const path = require('path');
+
 const _ = require('lodash');
 const Promise = require('bluebird');
 
 const util = require('./util');
+const store = require('./store');
+const player = require('./util/play');
 const config = require('./config');
 const interaction = require('./interaction');
 
 const file = config.file;
-const store = config.store;
 
 const recommentNum = 5;
 
@@ -19,7 +22,7 @@ module.exports = () => {
       util.exitWithAudio(file.no_story_found, false, true);
     } else {
       if (storylist.length > recommentNum) {
-        storylist = _.dropRight(storylist, storylist.length - number);
+        storylist = _.dropRight(storylist, storylist.length - recommentNum);
       }
       for (let index in storylist) {
         if (index === 2) {
@@ -44,8 +47,8 @@ module.exports = () => {
           break;
         }
       }
-
+      console.log('ok');
       util.exitWithAudio(file.storyexit, false, true);
     }
-  }.bind(this));
+  }.bind(this))();
 };

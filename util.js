@@ -1,9 +1,14 @@
+'use strict';
+
 const fs = require("fs");
 const exec = require('child_process').exec;
 
-const player = require('./util/play');
+const Promise = require('bluebird');
 
 const config = require("./config");
+const player = require('./util/play');
+const record2text = require('./util/record2text');
+
 const evt = config.evt;
 
 const co = require('co');
@@ -213,9 +218,9 @@ exports.ask = function (file) {
   return new Promise.coroutine(function* () {
     if (file) yield player(file);
     let result = yield record2text();
-    let matchResult = betterMatch(text, ["不", "no", "没", "否", "不想", "不听", "不要"], true);
+    let matchResult = betterMatch(result, ["不", "no", "没", "否", "不想", "不听", "不要"], true);
     return (matchResult || matchResult.length === 0) ? false : true;
-  }.bind(this));
+  }.bind(this))();
 }
 
 exports.init = function (ctx) {
@@ -277,29 +282,29 @@ exports.playinteraction = function (path, type) {
   });
 }
 
-function exit() {
+function exit(clear, remove) {
   if (clear) {
     exports.storyshedoperate("", "clear");
   }
   if (remove) {
-    client.removeListener("message");
+    // client.removeListener("message");
   }
   config.ctx = null;
   config.appDispatcher = null;
   config.webService = null;
   config.audio = null;
 
-  config.appDispatcher.unlockPush2Talk();
+  // config.appDispatcher.unlockPush2Talk();
 
   config.storytype = [];
   config.storyindexlist = [];
 
-  config.ctx.stop();
+  // config.ctx.stop();
 }
 
 module.exports.exitWithAudio = (file, clear, remove) => {
   return Promise.coroutine(function* () {
     yield player(file, 'break');
     exit(clear, remove);
-  }.bind(this));
+  }.bind(this))();
 };
