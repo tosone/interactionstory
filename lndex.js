@@ -1,22 +1,28 @@
 'use strict';
 
-const PRomise = require('bluebird');
+const colors = require('colors');
+const Promise = require('bluebird');
 const sdk = require('nodecontainer-sdk');
+const betterMatch = require('betterMatch');
 
 const util = require('./util');
 const config = require("./config");
 const server = require('./servers');
+const player = require('./util/play');
 const recommend = require('./recommend');
 const matchStory = require('./matchStory');
 const interaction = require('./interaction');
+const record2text = require('./util/record2text');
 
-const file = config.file;
+const mqtt = sdk.mqtt;
 const evt = config.evt;
 const app = config.app;
-const mqtt = sdk.mqtt;
+const file = config.file;
 
 app.registerAction('app/story');
 app.mount();
+
+console.log(colors.green('interaction_story is ready.'));
 
 // 我想听故事 1
 // 我想听XXX的故事 2
@@ -63,10 +69,10 @@ app.post('start', function (ctx, intent) {
   startdispacher(intent.extras.entities || intent.extras.params.entities, this);
 });
 
-let startdispacher = function (entities, ctx) {
-  return co(function* () {
+let startdispacher = entities => {
+  return Promise.coroutine(function* () {
     let storyType = 'interaction';
-    if (entities && entities.length !== 0 && entities[1].value === "babystory") {
+    if (entities && entities.length !== 0 && entities[1] && entities[1].value === "babystory") {
       storyType = 'babystory';
     }
     if (!entities || entities.length === 0 || entities[0].value === "") { //没有故事名
@@ -90,10 +96,10 @@ let startdispacher = function (entities, ctx) {
       if (story.length !== 0) { //设备上找得到
         interaction(story);
       } else { //设备上找不到
-        matchStory(entities[0].value, 'name', ctx);
+        matchStory(entities[0].value, 'name');
       }
     }
-  });
+  }.bind(this))();
 }
 
 app.post('pause', function (ctx) {

@@ -10,10 +10,13 @@
   "author": "tosone <i@tosiney.com> (http://tosiney.com)",
   "license": "ISC",
   "dependencies": {
+    "co": "^4.6.0",
+    "colors": "^1.1.2",
     "fs-extra": "^1.0.0",
     "glob": "^7.1.1",
     "lodash": "^4.17.2",
     "nodecontainer-sdk": "^1.0.4",
-    "request": "^2.79.0"
+    "request": "^2.79.0",
+    "uuid": "^3.0.1"
   }
 }

@@ -3,7 +3,7 @@
 const path = require('path');
 const os = require('os');
 
-const sdl = require('nodecontainer-sdk');
+const sdk = require('nodecontainer-sdk');
 
 const store = require('./store');
 
@@ -73,7 +73,6 @@ const resource = {
   'interaction': basepath_resource + 'interaction/',
   'picture': basepath_resource + 'picture/',
   'babylove': basepath_resource + 'babylove/'
-
 };
 
 const request_url = {
@@ -87,7 +86,6 @@ const feedback_url = {
   "storyfeedback": baseurl + "/interactiveStories/download-reply",
   "babylovefeedback": baseurl + "/babylove/download-reply",
 };
-
 
 module.exports = {
   //资源部分
@@ -113,7 +111,5 @@ module.exports = {
   storyshed: [],
   storytype: [],
   storyindexlist: [],
-  downloadlist: [],
-  dbname: path.resolve('storylist.json'),
-  store
+  downloadlist: []
 };

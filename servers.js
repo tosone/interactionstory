@@ -20,50 +20,12 @@ const feedback_url = config.feedback_url;
 
 let currStory = null;
 
-//入口分配
-//这里包括说话进入和手机端点播模拟push2talk进入
-exports.startdispacher = function (entities, ctx) {
-  co(function* () {
-    let storyType = 'interaction';
-
-    if (entities && entities.length !== 0 && entities[1].value === "babystory") {
-      storyType = 'babystory';
-    }
-
-    if (!entities || entities.length === 0 || entities[0].value === "") { //没有故事名
-      yield player(file.story_start); // 你想听什么故事
-      let text = yield record2text(); // 录音
-      let result = betterMatch(text, ["什么", "不知道", "什么故事"]);
-
-      if (result) { // 用户不知道要听什么故事
-        recommend();
-      } else { // 用户说的话可能是个故事名
-        matchStory(text, storyType, true); // 匹配搜索故事
-      }
-    } else if (entities[0].type === 'name') { // 推送的故事
-      let story = config.store.search(entities[0].value);
-      if (story.length !== 0) { // 设备上找得到
-        interaction(story); // 直接播放这个故事
-      } else { // 到云端下载
-        matchStory(text, storyType, false);
-      }
-    } else { // 我想听XXX的故事
-      let story = config.store.search(entities[0].value);
-      if (story.length !== 0) { //设备上找得到
-        interaction(story);
-      } else { //设备上找不到
-        matchStory(entities[0].value, 'name', ctx);
-      }
-    }
-  });
-}
-
 //下载完成后再启动
 exports.downloadoverstart = function (operate, name, path, type) {
   return co(function* () {
     if (operate) { //下载成功
       if (yield util.ask(file.downloadover_promat)) { //要听之前下载的故事
-        exports.continueplay({ "name": name, "path": path, "type": type });
+        exports.continueplay({ 'name': name, 'path': path, 'type': type });
       } else { //不听之前下载的故事
         exports.playandexit(file.story_end, false, true);
       }

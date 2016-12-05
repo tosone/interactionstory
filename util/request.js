@@ -5,7 +5,7 @@ const Promise = require('bluebird');
 const sdk = require('nodecontainer-sdk');
 
 const macAddress = sdk.macAddress;
-const baseurl = "http://bbcloud.com/api/devices/" + macAddress;
+const baseurl = "http://bbcloud.com/api/devices/" + 'e0:b9:4d:31:69:04';
 
 let storyType = 'interaction';
 let getBabyloveUrl = baseurl + "/babylove?q=";
@@ -21,19 +21,22 @@ module.exports = (name, type, search) => {
   if (storyType === 'babystory') { url = getBabyloveUrl; }
   url += name;
   return Promise.coroutine(function* () {
-    request(encodeURI(url), (err, response, body) => {
-      let info = null;
-      if (err || response.state !== 200) {
-        return null;
-      } else {
-        try {
-          info = JSON.parse(body);
-        } catch (e) {
-          console.log(e);
+    return yield new Promise(resolve => {
+      request(encodeURI(url), (err, response, body) => {
+        let info = null;
+
+        if (err) {
+          resolve(null);
+        } else {
+          try {
+            info = JSON.parse(body);
+          } catch (e) {
+            console.log(e);
+          }
+          let storylist = (storyType === 'babystory') ? info.babystory : info.storyList;
+          resolve({ bucket: info.bucket, storylist });
         }
-        let storylist = type === 'babystory' ? info.babystory : info.storyList;
-        return { bucket: info.bucket, storylist };
-      }
+      });
     })
   }.bind(this))();
 };

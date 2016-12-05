@@ -28,5 +28,11 @@
     "version": "0.0.1",
     "type": "picture",
     "path": "/home/root/userdata/resource/interaction_story/picture/wuyamianbaodian"
+  },
+  {
+    "name": "tosone",
+    "type": "basic",
+    "version": "///sss",
+    "path": "1.0.0"
   }
 ]

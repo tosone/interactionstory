@@ -20,8 +20,6 @@ const betterMatch = require("betterMatch");
 const thunder = config.thunder;
 const app = config.app;
 
-
-
 //选择判断
 //text 文本字符串
 //返回boolean
@@ -129,78 +127,6 @@ exports.playtext = function (text) {
   return config.ctx.runTask('text2speech', { text, parameter: 'offline&online' });
 }
 
-//模糊匹配
-//words 匹配的字符串
-//list Array 待匹配的列表
-//number int 最大的限定
-exports.bettermatch = function (words, list, number) {
-  console.log('bettermath---words:', words);
-  console.log('bettermath---list:', list);
-  console.log('bettermath---number:', number);
-  return new Promise((resolve, reject) => {
-    let resultlist = betterMatch(words, list, true);
-    if (resultlist) {
-      if (resultlist.length >= number) {
-        resultlist = _.dropRight(resultlist, resultlist.length - number);
-      }
-      resolve(resultlist);
-    } else {
-      resolve(resultlist);
-    }
-  });
-}
-
-//查询故事
-//storyname 故事名
-//type Array
-exports.querythestory = function (storyname, type) {
-  return new Promise((resolve, reject) => {
-    let number = 5;
-
-    redisclient.sort(storyname, "get", "story_*->id", "get", "story_*->name", "get", "story_*->type", "get", "story_*->path", "get", "story_*->version", (err, reply) => {
-
-      if (err || !reply) {
-        resolve([]);
-      } else {
-        var story = {};
-        var storylist = [];
-        config.storyindexlist = [];
-
-        for (var i = 0; i < reply.length; i++) {
-
-          if (type.indexOf(reply[Math.floor(i / number) * number + 2]) == -1) {
-            continue;
-          }
-
-          switch (i % number) {
-          case 0:
-            story.id = reply[i];
-            config.storyindexlist.push(reply[i]);
-            break;
-          case 1:
-            story.name = reply[i];
-            break;
-          case 2:
-            story.type = reply[i];
-            break;
-          case 3:
-            story.path = reply[i];
-            break;
-          case 4:
-            story.version = reply[i];
-            storylist.push(story);
-            story = {};
-            break;
-          default:
-            break;
-          }
-        }
-        resolve(storylist);
-      }
-    });
-  });
-}
-
 //故事记录查询
 exports.storyBreakPoint = function (record) {
   return new Promise((resolve, reject) => {
@@ -217,51 +143,6 @@ exports.storyBreakPoint = function (record) {
     });
   });
 }
-
-
-//存储故事
-exports.savestory = function (name, type, path, version) {
-  return new Promise((resolve, reject) => {
-    redisclient.incr("story_number", (err, reply) => {
-      if (err) {
-        resolve(false);
-      } else {
-
-        reply = "story_" + reply;
-
-        let data = ["id", reply, "name", name, "type", type, "path", path, "version", version];
-
-        redisclient.lpush("storylist", reply, (err, reply) => {
-          if (err) {
-            redisclient.decr("story_number");
-            resolve(false);
-          } else {
-            redisclient.lpush("story_" + name, reply, (err, reply) => {
-              if (err) {
-                redisclient.decr("story_number");
-                redisclient.lpop("storylist");
-                resolve(false);
-              } else {
-                redisclient.hmset(reply, data, (err, reply) => {
-                  if (err) {
-                    redisclient.decr("story_number");
-                    redisclient.lpop("storylist");
-                    redisclient.lpop(name);
-                    resolve(false);
-                  } else {
-                    resolve(true);
-                  }
-                });
-              }
-            });
-          }
-        });
-      }
-    });
-  });
-}
-
-
 
 exports.storyshedoperate = function (path, operate) {
   let number = 3;
@@ -293,10 +174,6 @@ exports.storyshedoperate = function (path, operate) {
   config.storyshed = storylist;
   return story;
 }
-
-//=============================================================
-//以下为未稳定版框架代码
-//=============================================================
 
 //播放声音
 exports.playsound = function (file, type) {
@@ -368,49 +245,12 @@ exports.exit = function (clear, remove) {
   config.ctx.stop();
 }
 
-//======================================
-//mqtt
-//======================================
-
-//下载
-//filename oss文件名
-//bucket oss bucket
-//返回为Promise
-//下载成功 返回为文件保存的位置
-//下载失败 返回空
-exports.download = function (bucket, filename) {
-  return new Promise((resolve, reject) => {
-    let correlationId = uuid.v4();
-
-    client.publish("download_manager/download/start", JSON.stringify({
-      "correlationId": correlationId,
-      "bucket": bucket,
-      "filename": filename
-    }), () => {
-      evt.on('download_manager_done', msg => {
-        if (JSON.parse(msg.payload).correlationId == correlationId) {
-          resolve(JSON.parse(msg.payload).file);
-        }
-      });
-
-      evt.on('download_manager_failed', msg => {
-        if (JSON.parse(msg.payload).correlationId == correlationId) {
-          resolve("");
-        }
-      });
-    });
-  });
-}
-
 //通知notification
 exports.notification = function (data) {
-  console.log('notification recieve ', data.params.entities);
   let payload = {
     "appId": config.appId,
     "params": data.params
   }
-
-  console.log('in notification payload', payload.params.entities);
   client.publish("notification_manager/notification/add", JSON.stringify(payload));
 }
 

@@ -1,11 +1,11 @@
 'use strict';
 
+const path = require('path');
+
 const fs = require('fs-extra');
 const _ = require('lodash');
 
-const config = require('./config');
-
-const dbname = config.dbname;
+const dbname = path.resolve('./storylist.json');
 let storylist = [];
 
 if (fs.existsSync(dbname)) {
